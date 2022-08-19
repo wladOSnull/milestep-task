@@ -172,12 +172,31 @@ Install **Tomcat 9** server (bacause of *.war* artefact of **Lavagna** project; 
 
 In this case i have used artefact *lavagna-jetty-console.war* from *target/* folder buided by myself but deployed this one just on the "host" machine. I did not use any DBs in this case.
 
-- deploy the project with using of embedded, by Maven plugin jetty-console, applet container
+- deploy the project with using of embedded, by Maven plugin "jetty-console", applet container
 
     ```sh
+    # in case of no DB command to eun is very simple
     ~ java -jar lavagna-jetty-console.war
     ```
 
 - check **Lavagna** service on http://localhost:8080/ - login/pass is *user*, as a result you have to see UI like this one on screenshot
 
     ![image](img/2.png?raw=true "Lavagna on 'local' machine")
+
+## Lavagna + embedded Jetty + HSQLDB
+
+There is no need to install *HSQLDB* due to embedded version in Lavagna *.war* artefact. Difference between previous and current step is only more specific run command.
+
+- deploy the project with using of embedded applet container and DB (by Maven plugin "jetty-console" and "hsqldb" dependency respectively)
+
+    ```sh
+    ~ java \
+    	-Ddatasource.dialect=HSQLDB \
+    	-Ddatasource.url=jdbc:hsqldb:mem:lavagna \
+    	-Ddatasource.username=sa \
+    	-Ddatasource.password= \
+    	-Dspring.profiles.active=prod \
+    	-jar lavagna-jetty-console.war
+    ```
+
+- all possible variables and values can be find in "lavagna.sh" from this chapter ->  [github](https://github.com/digitalfondue/lavagna#for-testing-purposes)
