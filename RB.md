@@ -156,7 +156,7 @@ Install **Tomcat 9** server (bacause of *.war* artefact of **Lavagna** project; 
 
 - try to connect from *host* web browser to **Tomcat** main page via http://server-ip:8080
 
-## Lavagna + Tomcat
+## Lavagna + Tomcat + no DB + "dev" mode
 
 - deploy artefact to **Tomcat**
 
@@ -164,11 +164,36 @@ Install **Tomcat 9** server (bacause of *.war* artefact of **Lavagna** project; 
     ~ sudo cp target/lavagna.war /opt/tomcat/webapps/
     ```
 
-- check **Lavagna** service on http://server-ip:8080/lavagna - login/pass is *user*, as a result you have to see UI like this one on screenshot
+- check **Lavagna** service on http://server-ip:8080/lavagna - login/pass is *user*, as a result you have to see Lavagna UI in *dev* mode
 
     ![image](img/1.png?raw=true "Lavagna on 'local' machine")
 
-## Lavagna + embedded Jetty + no DB
+## Lavagna + Tomcat + HSQLDB + "prod" mode
+
+To see Lavagna app in *prod* mode, this artefact must be deployed with **-Dspring.profiles.active=prod** argument (and optionally the other *JVM* options like DB connector, login/pass... if there is need). For this case Tomcat have to use spicific *env* file for providing *JVM* options for it's contained *.war* applications.
+
+- next steps provide the *JVM* options to Tomcat
+    ```sh
+    ~ sudo vi /opt/tomcat/bin/setenv.sh
+    ```
+
+    ```ini
+    JAVA_OPTS="$JAVA_OPTS -Ddatasource.dialect=HSQLDB -Ddatasource.url=jdbc:hsqldb:mem:lavagna -Ddatasource.username=sa -Ddatasource.password= -Dspring.profiles.active=prod"
+    ```
+
+    ```sh
+    ~ sudo chown tomcat: /opt/tomcat/bin/setenv.sh
+    ~ sudo chmod +x /opt/tomcat/bin/setenv.sh
+    ~ sudo systemctl restart tomcat.service
+    ```
+
+- all possible variables and values can be found in "lavagna.sh" from this chapter ->  [github](https://github.com/digitalfondue/lavagna#for-testing-purposes)
+
+- check **Lavagna** service on http://server-ip:8080/lavagna/, as a result you have to see Lavagna UI in *prod* mode, "setup" stage
+
+    ![image](img/4.png?raw=true "Lavagna on 'server'")
+
+## Lavagna + embedded Jetty + no DB + "dev" mode
 
 In this case i have used artefact *lavagna-jetty-console.war* from *target/* folder buided by myself but deployed this one just on the "host" machine. I did not use any DBs in this case.
 
@@ -183,7 +208,7 @@ In this case i have used artefact *lavagna-jetty-console.war* from *target/* fol
 
     ![image](img/2.png?raw=true "Lavagna on 'local' machine")
 
-## Lavagna + embedded Jetty + HSQLDB
+## Lavagna + embedded Jetty + HSQLDB + "prod" mode
 
 There is no need to install *HSQLDB* due to embedded version in Lavagna *.war* artefact. Difference between previous and current step is only more specific run command.
 
@@ -199,9 +224,66 @@ There is no need to install *HSQLDB* due to embedded version in Lavagna *.war* a
     	-jar lavagna-jetty-console.war
     ```
 
-- check **Lavagna** service on http://localhost:8080/, login/pass is *user*, as a result you have to see Lavagna UI in *prod* mode, "setup" stage
+- check **Lavagna** service on http://localhost:8080/, as a result you have to see Lavagna UI in *prod* mode, "setup" stage
 
     ![image](img/3.png?raw=true "Lavagna on 'local' machine")
 
-- all possible variables and values can be found in "lavagna.sh" from this chapter ->  [github](https://github.com/digitalfondue/lavagna#for-testing-purposes)
+## Lavagna + embedded Jetty + PGSQL + "prod" mode
 
+In this case application was runned on "host" machine in Jetty-embedded variant with PostgreSQL installed on "host" as well.
+
+- configure PostgreSQL for Lavagna
+
+    ```sh
+    ~ sudo -i -U postgres
+    ~ psql
+    ```
+
+    ```sql
+    /*
+    * beside of usual user-db creation there have to be "unaccent"
+    * extension, and all grants on functions for user
+    */
+    => CREATE USER lavagner WITH PASSWORD 'lava';
+    => CREATE DATABASE lavagna WITH OWNER lavagner ENCODING 'UTF8';
+    => GRANT ALL PRIVILEGES ON DATABASE lavagna TO lavagner;
+    => \c lavagna
+    => CREATE EXTENSION IF NOT EXISTS unaccent;
+    => GRANT ALL ON ALL FUNCTIONS IN SCHEMA public TO lavagner;
+    ```
+
+- new PostgreSQL user must have access to DB by password, so
+
+    ```sql
+    /*
+    * in psql to get path to pg_hba.conf
+    */
+    => SHOW hba_file;
+    ```
+
+    ```sh
+    ~ sudo vi /path/to/pg_hba.conf
+    ```
+
+    ```ini
+    local all postgres peer
+    local lavagna lavagner md5
+    ```
+
+- run Lavagna project with new *JVM* options for PostgreSQL DB
+
+    ```sh
+    ~ java \
+        -Ddatasource.dialect=PGSQL \
+        -Ddatasource.url=jdbc:postgresql://localhost:5432/lavagna \
+        -Ddatasource.username=lavagner \
+        -Ddatasource.password=lava \
+        -Dspring.profiles.active=dev \
+        -jar lavagna-jetty-console.war
+    ```
+
+- check **Lavagna** service on http://localhost:8080/, as a result you have to see Lavagna UI in *prod* mode, "setup" stage
+
+    ![image](img/5.png?raw=true "Lavagna on 'local' machine after restarting with persisted DB")
+
+- and now after initialisation of Lavagna, creation some test board and restarting Lavagna app - data are persisted
