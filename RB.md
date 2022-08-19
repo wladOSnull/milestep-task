@@ -179,7 +179,7 @@ In this case i have used artefact *lavagna-jetty-console.war* from *target/* fol
     ~ java -jar lavagna-jetty-console.war
     ```
 
-- check **Lavagna** service on http://localhost:8080/ - login/pass is *user*, as a result you have to see UI like this one on screenshot
+- check **Lavagna** service on http://localhost:8080/, login/pass is *user*, as a result you have to see Lavagna UI in *dev* mode
 
     ![image](img/2.png?raw=true "Lavagna on 'local' machine")
 
@@ -199,4 +199,9 @@ There is no need to install *HSQLDB* due to embedded version in Lavagna *.war* a
     	-jar lavagna-jetty-console.war
     ```
 
-- all possible variables and values can be find in "lavagna.sh" from this chapter ->  [github](https://github.com/digitalfondue/lavagna#for-testing-purposes)
+- check **Lavagna** service on http://localhost:8080/, login/pass is *user*, as a result you have to see Lavagna UI in *prod* mode, "setup" stage
+
+    ![image](img/3.png?raw=true "Lavagna on 'local' machine")
+
+- all possible variables and values can be found in "lavagna.sh" from this chapter ->  [github](https://github.com/digitalfondue/lavagna#for-testing-purposes)
+
