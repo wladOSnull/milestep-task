@@ -74,6 +74,19 @@ Install **Maven** (bacause of Java lang and Maven-way in *Lavagna* project).
 
     - ***OPTIONALLY:*** use this tutorial for Maven CLI autocompletion -> [github](https://github.com/juven/maven-bash-completion)
 
+## Lavagna
+
+- get the **Lavagna** project and build it
+
+    ```sh
+    ~ git clone https://github.com/digitalfondue/lavagna
+    ~ cd lavagna
+    ~ mvn install
+
+    # check the artefacts, there must be 'lavagna.war' and 'lavagna-jetty-console.war'
+    ~ ls -la ./target
+    ```
+
 ## Tomcat
 
 Install **Tomcat 9** server (bacause of *.war* artefact of **Lavagna** project; also 9 version, because 10v has some problem with old servlet applications)
@@ -145,17 +158,6 @@ Install **Tomcat 9** server (bacause of *.war* artefact of **Lavagna** project; 
 
 ## Lavagna + Tomcat
 
-- get the **Lavagna** project and build it
-
-    ```sh
-    ~ git clone https://github.com/digitalfondue/lavagna
-    ~ cd lavagna
-    ~ mvn install
-
-    # check the artefacts
-    ~ ls -la ./target
-    ```
-
 - deploy artefact to **Tomcat**
 
     ```sh
@@ -165,3 +167,17 @@ Install **Tomcat 9** server (bacause of *.war* artefact of **Lavagna** project; 
 - check **Lavagna** service on http://server-ip:8080/lavagna - login/pass is *user*, as a result you have to see UI like this one on screenshot
 
     ![image](img/1.png?raw=true "Lavagna on 'local' machine")
+
+## Lavagna + embedded Jetty + no DB
+
+In this case i have used artefact *lavagna-jetty-console.war* from *target/* folder buided by myself but deployed this one just on the "host" machine. I did not use any DBs in this case.
+
+- deploy the project with using of embedded, by Maven plugin jetty-console, applet container
+
+    ```sh
+    ~ java -jar lavagna-jetty-console.war
+    ```
+
+- check **Lavagna** service on http://localhost:8080/ - login/pass is *user*, as a result you have to see UI like this one on screenshot
+
+    ![image](img/2.png?raw=true "Lavagna on 'local' machine")
