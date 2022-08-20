@@ -37,9 +37,7 @@ This is DevOps runbook for test task.
 
 ### Maven
 
-Install **Maven** (bacause of Java lang and Maven-way in *Lavagna* project).
-
-- install **jdk**
+Install **Maven** (bacause of Java lang and Maven-way in *Lavagna* project). Also Maven needs JDK as well, but for the project recommend is 1.8 version (actually Maven cannot even build Lavagna with 11).
 
 - Java installing 
 
@@ -308,3 +306,27 @@ First of all there must be installed Jetty. For this purpose was used available 
         ~ sudo java -jar $JETTY_HOME/start.jar -Djetty.http.port=808
         ```
     - or edit *jetty.http.port* entry in *http.ini* file (more detail in next chapter -> [eclipse.org](https://www.eclipse.org/jetty/documentation/jetty-11/operations-guide/index.html#og-begin-start))
+
+## Lavagna + Docker Jetty + no DB + "dev" mode
+
+In this case Lavagna was runned in dockerized version of Jetty in very primitive way. Version of Jetty is not the last, because of problem with running old servlet (like Tomcat 10, so in this runbook was used Tomcat 9). Below is command for puling Jetty 9.4.48 image, due to researches of *pom.xml*, where 9.4.44 version is used.
+
+- get & run Jetty as docker image
+
+    ```sh
+    # get the specified version of Jetty
+    ~ docker pull jetty:9.4.48-jdk8-openjdk
+    
+    # create container
+    ~ docker create --name lavagna -p 80:8080 jetty:9.4.48-jdk8-openjdk
+    
+    # provide Lavagna to container
+    ~ docker cp lavagna.war lavagna:/var/lib/jetty/webapps/ROOT.war
+
+    # start the container
+    ~ docker start lavagna
+    ```
+
+- check **Lavagna** service on http://localhost/, login/pass is user, as a result you have to see Lavagna UI in *dev* mode
+
+    ![image](img/5.png?raw=true "Lavagna on 'local' machine after restarting with persisted DB")
