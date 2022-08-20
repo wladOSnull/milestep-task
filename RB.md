@@ -187,6 +187,12 @@ To see Lavagna app in *prod* mode, this artefact must be deployed with **-Dsprin
     ~ sudo systemctl restart tomcat.service
     ```
 
+- or it can be defined in an external file (like the bundled *sample-conf.properties*) and define the following property
+
+    ```ini
+    JAVA_OPTS="$JAVA_OPTS -Dlavagna.config.location=file:/your/file/location.properties
+    ```
+
 - all possible variables and values can be found in "lavagna.sh" from this chapter ->  [github](https://github.com/digitalfondue/lavagna#for-testing-purposes)
 
 - check **Lavagna** service on http://server-ip:8080/lavagna/, as a result you have to see Lavagna UI in *prod* mode, "setup" stage
@@ -287,3 +293,18 @@ In this case application was runned on "host" machine in Jetty-embedded variant 
     ![image](img/5.png?raw=true "Lavagna on 'local' machine after restarting with persisted DB")
 
 - and now after initialisation of Lavagna, creation some test board and restarting Lavagna app - data are persisted
+
+## Lavagna + standalone Jetty + no DB + "prod" mode
+
+First of all there must be installed Jetty. For this purpose was used available "server" with Tomcat.
+
+- install Eclipse Jetty 11 from by official guide (quick start is enough) -> [eclipse.org](https://www.eclipse.org/jetty/documentation/jetty-11/operations-guide/index.html#og-quick-setup), do not forget to add all necessary modules - *server, http, deploy*
+
+- Jetty must be runned with specified port (8080 port conflict, due to Tomcat server), so
+
+    - use this command
+
+        ```sh
+        ~ sudo java -jar $JETTY_HOME/start.jar -Djetty.http.port=808
+        ```
+    - or edit *jetty.http.port* entry in *http.ini* file (more detail in next chapter -> [eclipse.org](https://www.eclipse.org/jetty/documentation/jetty-11/operations-guide/index.html#og-begin-start))
