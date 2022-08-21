@@ -439,3 +439,33 @@ This case demands only slightly different command to run Docker image. Also used
 - check **Lavagna** service on http://localhost:8080/, login/pass is user, as a result you have to see Lavagna UI in *prod* mode
 
     ![image](img/8.png?raw=true "Lavagna in Jetty container with old 'host' DB in 'prod' mode")
+
+## Dockerization of the Lavagna
+
+Lavanga can be used as Docker image (actually based on Jetty). For this purpose was written Dockerfile. Something was explored in official Docker Hub page of Jetty (small example of creating derived images), something borrowed from original Dockerfile of Jetty image (*ENTRYPOINT* and *CMD* for keeping trick of passing of the Java options).
+
+[Dockerfile for the Lavanga app](./Dockerfile)
+
+- place Dockerfile and *lavanga.war* in same directory (or edit path to artefact in *COPY* instruction)
+
+- build image with specified tag by *-t* option
+
+    ```sh
+    ~ docker build -t lavagna .
+    ```
+
+- run image faster now
+
+    ```sh
+    ~ docker run \
+        -d \
+        --name lavagna \
+        --network=host \
+        -e JAVA_OPTIONS="\
+            -Ddatasource.dialect=PGSQL \
+            -Ddatasource.url=jdbc:postgresql://localhost:5432/lavagna \
+            -Ddatasource.username=lavagner \
+            -Ddatasource.password=lava \
+            -Dspring.profiles.active=prod" \
+        lavagna:latest
+    ```
