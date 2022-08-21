@@ -37,7 +37,7 @@ This is DevOps runbook for test task.
 
 ### Maven
 
-Install **Maven** (bacause of Java lang and Maven-way in *Lavagna* project). Also Maven needs JDK as well, but for the project recommend is 1.8 version (actually Maven cannot even build Lavagna with 11).
+Install **Maven** (bacause of Java lang and Maven-way in *Lavagna* project). Also Maven needs JDK as well, but for the project recommend is 1.8 version (actually Maven cannot even build Lavagna with opendjdk-11 for example).
 
 - Java installing 
 
@@ -282,7 +282,7 @@ In this case application was runned on "host" machine in Jetty-embedded variant 
         -Ddatasource.url=jdbc:postgresql://localhost:5432/lavagna \
         -Ddatasource.username=lavagner \
         -Ddatasource.password=lava \
-        -Dspring.profiles.active=dev \
+        -Dspring.profiles.active=prod \
         -jar lavagna-jetty-console.war
     ```
 
@@ -292,26 +292,38 @@ In this case application was runned on "host" machine in Jetty-embedded variant 
 
 - and now after initialisation of Lavagna, creation some test board and restarting Lavagna app - data are persisted
 
-## Lavagna + standalone Jetty + no DB + "prod" mode
+## Lavagna + standalone Jetty + HSQLDB + "prod" mode
 
-First of all there must be installed Jetty. For this purpose was used available "server" with Tomcat.
+First of all there must be installed Jetty. For this purpose was used available "server" with Tomcat. Version of Jetty is not the last, because of problem with running old servlet (like Tomcat 10, so in this runbook was used Tomcat 9). In this case was used Jetty 9.4.48 version, due to researches of *pom.xml*, where 9.4.44 version is used.
 
-- install Eclipse Jetty 11 from by official guide (quick start is enough) -> [eclipse.org](https://www.eclipse.org/jetty/documentation/jetty-11/operations-guide/index.html#og-quick-setup), do not forget to add all necessary modules - *server, http, deploy*
+- install Eclipse Jetty 9.4.48 from Eclipse site by official guide -> [eclipse.org](https://www.eclipse.org/jetty/documentation/jetty-9/index.html#quickstart-running-jetty)
+
+- perform steps for *.war* deploy (just copy "lavagna.war" to "webapps" directory of Jetty)
 
 - Jetty must be runned with specified port (8080 port conflict, due to Tomcat server), so
 
-    - use this command
+    - use *-Djetty.http.port=8081* Java option in command
 
         ```sh
-        ~ sudo java -jar $JETTY_HOME/start.jar -Djetty.http.port=808
+        ~ java -jar start.jar \
+            -Djetty.http.port=8081 \
+            -Ddatasource.dialect=HSQLDB \
+            -Ddatasource.url=jdbc:hsqldb:mem:lavagna \
+            -Ddatasource.username=sa \
+            -Ddatasource.password= \
+            -Dspring.profiles.active=prod
         ```
-    - or edit *jetty.http.port* entry in *http.ini* file (more detail in next chapter -> [eclipse.org](https://www.eclipse.org/jetty/documentation/jetty-11/operations-guide/index.html#og-begin-start))
+    - or edit *jetty.http.port* entry in *http.ini* file (more detail in "Changing the Jetty Port" chapter -> [eclipse.org](https://www.eclipse.org/jetty/documentation/jetty-9/index.html#quickstart-common-config))
+
+- check **Lavagna** service on http://server-ip:8081/, as a result you have to see Lavagna UI in *prod* mode, "setup" stage
+
+    ![image](img/7.png?raw=true "Lavagna on 'server' machine with HSQLDB")
 
 ## Lavagna + Docker Jetty + no DB + "dev" mode
 
-In this case Lavagna was runned in dockerized version of Jetty in very primitive way. Version of Jetty is not the last, because of problem with running old servlet (like Tomcat 10, so in this runbook was used Tomcat 9). Below is command for puling Jetty 9.4.48 image, due to researches of *pom.xml*, where 9.4.44 version is used.
+In this case Lavagna was runned in dockerized version of Jetty in very primitive way. Version of Jetty is not the last, because of problem with running old servlet (like Tomcat 10, so in this runbook was used Tomcat 9). Below is command for pulling Jetty 9.4.48 image, due to researches of *pom.xml*, where 9.4.44 version is used.
 
-- get & run Jetty as docker image
+- get & run Jetty as docker image with the Lavagna app
 
     ```sh
     # get the specified version of Jetty
@@ -329,4 +341,101 @@ In this case Lavagna was runned in dockerized version of Jetty in very primitive
 
 - check **Lavagna** service on http://localhost/, login/pass is user, as a result you have to see Lavagna UI in *dev* mode
 
-    ![image](img/5.png?raw=true "Lavagna on 'local' machine after restarting with persisted DB")
+    ![image](img/6.png?raw=true "Lavagna on 'local' machine in 'dev' mode")
+
+## Lavagna + Docker Jetty + local PGSQL + "dev" mode
+
+It is also possible to run the Lavagna project inside Jetty container but with connection to "local" or "host" Postgres DB. This DB was already created/initialized in ***Lavagna + embedded Jetty + PGSQL + "prod" mode*** chapter of this runbook.
+
+- for this case Postgres must
+    - either accept conection from other netwok - ***separate networks***
+    - or container with Lavagna must share "host" network - ***shared network***
+
+### Separate networks
+
+- add to file *postgresql.conf*, in same directory with *pg_hna.conf*) new *listen_addresses* entry under comment
+
+    ```sh
+    ~ sudo vi /etc/postgresql/12/main/postgresql.conf
+    ```
+
+    ```ini
+    #listen_addresses = 'localhost'         # what IP address(es) to listen on;
+    listen_addresses = '*'
+    ```
+
+- get the Docker network addresses
+
+    ```sh
+    # there must be 'docker0' interface with 'inet' and 'inet6' strings
+    ~ ip address
+    ```
+
+- add new rules for connection to DB from Docker network with ipv4 and ipv6
+
+    ```sh
+    ~ sudo vi /path/to/pg_hba.conf
+    ```
+
+    ```ini
+    host lavagna lavagner 172.17.0.1/16 md5
+    host lavagna lavagner fe80::11:ab12:cd34:ef56/64 md5
+    ```
+
+- restart Postgres
+
+- run Jetty image with the Lavagna app, pay attention to ip private address of your "host" machine with installed Postgres in *-Ddatasource.url* argument (like 192.168.0.101 or 10.0.0.12 etc.)
+
+    ```sh
+    # create container
+    ~ docker create \
+        --name lavagna \
+        -p 80:8080 \
+        -e JAVA_OPTIONS="\
+            -Ddatasource.dialect=PGSQL \
+            -Ddatasource.url=jdbc:postgresql://private-ip-of-host:5432/lavagna \
+            -Ddatasource.username=lavagner \
+            -Ddatasource.password=lava \
+            -Dspring.profiles.active=prod" \
+        jetty:9.4.48-jdk8-openjdk
+
+    # provide Lavagna to container
+    ~ docker cp lavagna.war lavagna:/var/lib/jetty/webapps/ROOT.war
+
+    # start the container
+    ~ docker start lavagna
+    ```
+
+- check **Lavagna** service on http://localhost/, login/pass is user, as a result you have to see Lavagna UI in *prod* mode
+
+    ![image](img/8.png?raw=true "Lavagna in Jetty container with old 'host' DB in 'prod' mode")
+
+### Shared network
+
+This case demands only slightly different command to run Docker image. Also used ports for container -> used port in "host" machine, so there is no need in *-p* binding now. IP address of Postgres DB is *localhost:5432*, due to common network for Postgres and container.
+
+- 
+
+    ```sh
+    # create container and bind to Docker network with "host" type of driver, '-p' is redundant now
+    ~ docker create \
+        --name lavagna \
+        --network=host \
+        -e JAVA_OPTIONS="\
+            -Ddatasource.dialect=PGSQL \
+            -Ddatasource.url=jdbc:postgresql://localhost:5432/lavagna \
+            -Ddatasource.username=lavagner \
+            -Ddatasource.password=lava \
+            -Dspring.profiles.active=prod" \
+        jetty:9.4.48-jdk8-openjdk
+
+    # provide Lavagna to container
+    ~ docker cp lavagna.war lavagna:/var/lib/jetty/webapps/ROOT.war
+
+    # start the container
+    ~ docker start lavagna
+    ```
+
+- check **Lavagna** service on http://localhost:8080/, login/pass is user, as a result you have to see Lavagna UI in *prod* mode
+
+    ![image](img/8.png?raw=true "Lavagna in Jetty container with old 'host' DB in 'prod' mode")
