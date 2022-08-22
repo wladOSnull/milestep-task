@@ -1,4 +1,4 @@
-# Mile Step
+# Runbook
 
 This is DevOps runbook for test task.
 
@@ -33,7 +33,8 @@ This is DevOps runbook for test task.
     - connect to server via **ssh** by password
     - use now **scp** for providing *.pub* key
     - connect to server now with **ssh** by key
-    - -> all "manipulation" with server will be performed now from "host" terminal
+
+P.s.: all "manipulation" with server will be performed now from "host" terminal
 
 ### Maven
 
