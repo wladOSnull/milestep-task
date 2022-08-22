@@ -510,3 +510,34 @@ Due to requirements in README.md of the Lavagna - DB must be created with specif
 - simple proof that containers were recreated and data was not lost
 
     ![image](img/11.png?raw=true "Persistent volume is worked")
+
+## Docker Compose + Lavagna + MySQL
+
+Lavagna+MySQL variant of deploy share:
+- *.war* artefact
+- *Dockerfile* for the Lavagna
+- *.env* file (MySQL variables are need to be added) 
+
+Official page of Dockerized MySQL describe smart way to change some attributes/variables/sheets parameters by providing values to **musqld** -> [hub.docker](https://hub.docker.com/_/mysql#:~:text=Configuration%20without%20a%20cnf%20file). So in this case there is no need in Dockerfile for specific build of DB for the Lavagna. All options can be provided "on wheels" in Compose file.
+
+- create Docker Compose file -> [docker-compose](./docker-compose/docker-compose-mysql.yml)
+
+- add new variables for MySQL to *.env* file
+
+- simple *up-down* are enough for running the Lavagna
+
+    ```sh
+    ~ docker compose -f docker-compose-mysql.yaml up
+    ```
+
+- initialise the Lavagna and create some "project"  on http://localhost:8080
+
+- stop containers with *Ctrl+C* or *stop* (if *-d* options was used) or even kill them with *down* and rerun with *start* or *up*
+
+- check **Lavagna** again on http://localhost:8080/, as a result you have to see "old" data - available "admin" user and created Project
+
+    ![image](img/12.png?raw=true "Lavagna + PSQL after re-up by Dockre Compose")
+
+- simple proof that containers were recreated and data was not lost
+
+    ![image](img/13.png?raw=true "Persistent volume is worked")

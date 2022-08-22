@@ -1,0 +1,46 @@
+version: '3.8'
+
+services:
+  service_lavagna_server:
+    container_name: lavagna_server_my
+    build:
+      context: .
+      dockerfile: Dockerfile_lavagna
+    ports:
+      - 8080:8080
+    environment:
+      - |
+        JAVA_OPTIONS=
+            -Ddatasource.dialect=${MY_DIALECT}
+            -Ddatasource.url=${MY_CONNECTOR}//lavagna_db_my:${MY_PORT}/${DB_NAME}
+            -Dspring.profiles.active=${APP_MODE}
+            -Ddatasource.username=${DB_LOGIN}
+            -Ddatasource.password=${DB_PASS}            
+    depends_on:
+      service_lavagna_db_my:
+          condition: service_healthy
+
+  service_lavagna_db_my:
+    container_name: lavagna_db_my
+    image: mysql:8.0
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MY_ROOT_PASS}
+      - MYSQL_DATABASE=${DB_NAME}
+      - MYSQL_USER=${DB_LOGIN}
+      - MYSQL_PASSWORD=${DB_PASS}
+    volumes:
+      - lavagna_my:/var/lib/mysql 
+    command: ['mysqld', '--character-set-server=utf8mb4', '--collation-server=utf8mb4_unicode_ci', '--log-bin-trust-function-creators=1']
+ 
+    healthcheck:
+      test: ["CMD", 'mysqladmin', 'ping', '-h', 'localhost', '-u', 'root', '-p$MY_ROOT_PASS']
+      timeout: 20s
+      retries: 10
+
+networks:
+  default:
+    name: lavagna_net_my
+
+volumes:
+  lavagna_my:
+    name: lavagna_vol_my
