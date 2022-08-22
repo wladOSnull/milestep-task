@@ -1,0 +1,7 @@
+FROM postgres:14.5
+LABEL maintainer="https://github.com/wladOSnull"
+
+COPY ./post_configuration.sh /docker-entrypoint-initdb.d/
+
+ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
+CMD ["postgres"]

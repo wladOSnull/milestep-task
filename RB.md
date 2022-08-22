@@ -191,7 +191,9 @@ To see Lavagna app in *prod* mode, this artefact must be deployed with **-Dsprin
     JAVA_OPTS="$JAVA_OPTS -Dlavagna.config.location=file:/your/file/location.properties
     ```
 
-- all possible variables and values can be found in "lavagna.sh" from this chapter ->  [github](https://github.com/digitalfondue/lavagna#for-testing-purposes)
+- all possible variables and values can be found in 
+    - "lavagna.sh" from this chapter ->  [github](https://github.com/digitalfondue/lavagna#for-testing-purposes)
+    - "README_EXECUTABLE_WAR.txt" in main repo -> [github](https://github.com/digitalfondue/lavagna/blob/master/README_EXECUTABLE_WAR.txt)
 
 - check **Lavagna** service on http://server-ip:8080/lavagna/, as a result you have to see Lavagna UI in *prod* mode, "setup" stage
 
@@ -367,7 +369,7 @@ It is also possible to run the Lavagna project inside Jetty container but with c
 - get the Docker network addresses
 
     ```sh
-    # there must be 'docker0' interface with 'inet' and 'inet6' strings
+    # there must be 'docker0' interface with 'inet' strings
     ~ ip address
     ```
 
@@ -378,8 +380,7 @@ It is also possible to run the Lavagna project inside Jetty container but with c
     ```
 
     ```ini
-    host lavagna lavagner 172.17.0.1/16 md5
-    host lavagna lavagner fe80::11:ab12:cd34:ef56/64 md5
+    host lavagna lavagner 172.16.0.0/12 md5
     ```
 
 - restart Postgres
@@ -414,7 +415,7 @@ It is also possible to run the Lavagna project inside Jetty container but with c
 
 This case demands only slightly different command to run Docker image. Also used ports for container -> used port in "host" machine, so there is no need in *-p* binding now. IP address of Postgres DB is *localhost:5432*, due to common network for Postgres and container.
 
-- 
+- run docker container with "localhost" address
 
     ```sh
     # create container and bind to Docker network with "host" type of driver, '-p' is redundant now
@@ -438,7 +439,7 @@ This case demands only slightly different command to run Docker image. Also used
 
 - check **Lavagna** service on http://localhost:8080/, login/pass is user, as a result you have to see Lavagna UI in *prod* mode
 
-    ![image](img/8.png?raw=true "Lavagna in Jetty container with old 'host' DB in 'prod' mode")
+    ![image](img/9.png?raw=true "Lavagna in Jetty container with old 'host' DB in 'prod' mode")
 
 ## Dockerization of the Lavagna
 
@@ -469,3 +470,43 @@ Lavanga can be used as Docker image (actually based on Jetty). For this purpose 
             -Dspring.profiles.active=prod" \
         lavagna:latest
     ```
+
+## Docker Compose + Lavagna + PostgreSQL
+
+In this case the app and DB deployed by Docker Compose new gen - not the *docker-compose* but *docker compose* (without hyphen). This thing was installed like Docker extension from *apt* repository -> [docs.docker](https://docs.docker.com/compose/install/compose-plugin/#install-using-the-repository).
+
+Due to requirements in README.md of the Lavagna - DB must be created with specified *character set* and *collation* -> [github](https://github.com/digitalfondue/lavagna#notes-about-databases)
+
+- build *.war* artefact of the Lavagna of course
+
+- create bash script for "post-configuration" of Postgres -> [script](./docker-compose/post_configuration.sh)
+
+- create Dockerfile for new Postgres image -> [Dockerfile](./docker-compose/Dockerfile_postgres)
+    - *COPY* instruction demands bash script in parent folder of Dockerfile
+
+- create Dockerfile for Lavagna app -> [Dockerfile](./docker-compose/Dockerfile_lavagna)
+    - *COPY* instruction demands artefact of Lavagna in parent folder of Dockerfile
+
+- create Docker Compose file -> [docker-compose](./docker-compose/docker-compose-psql.yml)
+
+    - Compose will create persistent volume, so app will save any changes between *start-stop* and even *up-down* commands
+
+- for best practices Compose file needs also *.env* file with variables -> due to sensetive data and ".gitignore" it isn't included
+
+- simple *up-down* are enough for running the Lavagna
+
+    ```sh
+    ~ docker compose -f docker-compose-psql.yaml up
+    ```
+
+- initialise the Lavagna and create some "project"  on http://localhost
+
+- stop containers with *Ctrl+C* or *stop* (if *-d* options was used) or even kill them with *down* and rerun with *start* or *up*
+
+- check **Lavagna** again on http://localhost/, as a result you have to see "old" data - available "admin" user and created Project
+
+    ![image](img/10.png?raw=true "Lavagna + PSQL after re-up by Dockre Compose")
+
+- simple proof that containers were recreated and data was not lost
+
+    ![image](img/11.png?raw=true "Persistent volume is worked")

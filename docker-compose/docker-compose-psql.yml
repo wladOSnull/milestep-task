@@ -1,0 +1,41 @@
+version: '3.8'
+
+services:
+  service_lavagna_server:
+    container_name: lavagna_server_pg
+    build:
+      context: .
+      dockerfile: Dockerfile_lavagna
+    ports:
+      - 80:8080
+    environment:
+      - |
+        JAVA_OPTIONS=
+            -Ddatasource.dialect=${PG_DIALECT}
+            -Ddatasource.url=${PG_CONNECTOR}//lavagna_db_pg:${PG_PORT}/${DB_NAME}
+            -Ddatasource.username=${DB_LOGIN} 
+            -Ddatasource.password=${DB_PASS}
+            -Dspring.profiles.active=${APP_MODE}
+    depends_on:
+      - service_lavagna_db
+
+  service_lavagna_db:
+    container_name: lavagna_db_pg
+    build:
+      context: .
+      dockerfile: Dockerfile_postgres
+    environment:
+      - POSTGRES_DB=${DB_NAME}
+      - POSTGRES_USER=${DB_LOGIN}
+      - POSTGRES_PASSWORD=${DB_PASS}
+      - PGDATA=/var/lib/postgresql/data/pgdata
+    volumes:
+      - lavagna_pg:/var/lib/postgresql/data 
+
+networks:
+  default:
+    name: lavagna_net_pg
+
+volumes:
+  lavagna_pg:
+    name: lavagna_vol_pg
