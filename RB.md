@@ -346,7 +346,7 @@ In this case Lavagna was runned in dockerized version of Jetty in very primitive
 
     ![image](img/6.png?raw=true "Lavagna on 'local' machine in 'dev' mode")
 
-## Lavagna + Docker Jetty + local PGSQL + "dev" mode
+## Lavagna + Docker Jetty + local PGSQL + "prod" mode
 
 It is also possible to run the Lavagna project inside Jetty container but with connection to "local" or "host" Postgres DB. This DB was already created/initialized in ***Lavagna + embedded Jetty + PGSQL + "prod" mode*** chapter of this runbook.
 
