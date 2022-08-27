@@ -29,7 +29,13 @@ services:
       - POSTGRES_PASSWORD=${DB_PASS}
       - PGDATA=/var/lib/postgresql/data/pgdata
     volumes:
-      - lavagna_pg:/var/lib/postgresql/data 
+      - lavagna_pg:/var/lib/postgresql/data
+    
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "${DB_LOGIN}", "-d", "${DB_NAME}"]
+      start_period: 5s  
+      interval: 5s
+      retries: 10
 
 networks:
   default:
