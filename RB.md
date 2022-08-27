@@ -542,3 +542,65 @@ Official page of Dockerized MySQL describe smart way to change some attributes/v
 - simple proof that containers were recreated and data was not lost
 
     ![image](img/13.png?raw=true "Persistent volume is worked")
+
+## Docker Compose + Lavagna + PostgreSQL/MySQL (transit variables)
+
+In this case the dockerized Lavagna will receive variables (for connection to DB and app mode) from Docker Compose file by "transit". This vars will be parsed by Compose from *.env* file and send to build stage.  
+
+*ENV* cannot be freely passed to build, so this vars must be declared in *build* stage of Compose file, in *args* block
+
+```yml
+...
+
+args:
+    name1_for_Dockerfile: name1_from_dotenv
+    name2_for_Dockerfile: name2_from_dotenv
+    ...
+...
+
+```
+
+Then, each of this **name_for_Dockerfile** vars must be declared again in Dockerfile with *ARG* instruction.
+
+```Dockerfile
+ARG name1_for_Dockerfile
+ARG name2_for_Dockerfile
+```
+
+**Only now** this vars can be used both in *build* and *run* stage (when container will be runned/created from image).
+
+Also, the vars can be used:
+- directly in **CMD** string (*"JAVA_OPTIONS = -Darg1=..."*)  
+- separately in **ENV** instruction  
+
+In this case, **ENV** case was used due to best readability and saving original **CMD** string.
+
+- edit Docker Compose file -> [docker-compose](./docker-compose/docker-compose-psql.yml)
+
+- edit Dockerfile file -> [Dockerfile](./docker-compose/Dockerfile_lavagna)
+
+If Docker Compose was previously runned with old variant of Dockerfile (without **ARG**s) there must be old Docker Compose images.
+
+```sh
+# they have "docker-compose" prefix probably
+~ docker images | grep docker-compose
+```
+
+![image](img/14.png?raw=true "Lavagna + PSQL after re-up by Dockre Compose")
+
+**Compose does not rebuild images by its own even there is obviously changes in Dockerfile !**
+
+- rebuild lavagna image for Compose forcely
+
+    ```sh
+    ~ docker compose -f docker-compose-psql.yml build
+    ```
+
+- **only now**, simple *up-down* are enough for running the Lavagna
+
+    ```sh
+    ~ docker compose -f docker-compose-psql.yaml up
+    ```
+
+- open the Lavagna on http://localhost (there must be project already, because app was initialized in "Docker Compose + Lavagna + PostgreSQL" chapter)
+

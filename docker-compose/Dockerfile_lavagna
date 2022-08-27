@@ -1,6 +1,23 @@
 FROM jetty:9.4.48-jdk11-alpine
 LABEL maintainer="https://github.com/wladOSnull"
 
+# for transit into image
+ARG PG_DIALECT
+ARG PG_CONNECTOR
+ARG PG_PORT
+ARG DB_NAME
+ARG DB_LOGIN
+ARG DB_PASS
+ARG APP_MODE
+
+# now this vars are used
+ENV JAVA_OPTIONS \
+        -Ddatasource.dialect=${PG_DIALECT} \
+        -Ddatasource.url=${PG_CONNECTOR}//lavagna_db_pg:${PG_PORT}/${DB_NAME} \
+        -Ddatasource.username=${DB_LOGIN} \
+        -Ddatasource.password=${DB_PASS} \
+        -Dspring.profiles.active=${APP_MODE}  
+
 COPY ./lavagna.war /var/lib/jetty/webapps/ROOT.war
 
 ENTRYPOINT ["/docker-entrypoint.sh"]
