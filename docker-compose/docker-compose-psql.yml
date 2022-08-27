@@ -15,7 +15,6 @@ services:
         -Ddatasource.username=${DB_LOGIN} 
         -Ddatasource.password=${DB_PASS}
         -Dspring.profiles.active=${APP_MODE}
-
     depends_on:
       - service_lavagna_db
 
