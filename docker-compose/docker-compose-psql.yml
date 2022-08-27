@@ -9,13 +9,13 @@ services:
     ports:
       - 80:8080
     environment:
-      - |
-        JAVA_OPTIONS=
-            -Ddatasource.dialect=${PG_DIALECT}
-            -Ddatasource.url=${PG_CONNECTOR}//lavagna_db_pg:${PG_PORT}/${DB_NAME}
-            -Ddatasource.username=${DB_LOGIN} 
-            -Ddatasource.password=${DB_PASS}
-            -Dspring.profiles.active=${APP_MODE}
+      JAVA_OPTIONS: >
+        -Ddatasource.dialect=${PG_DIALECT}
+        -Ddatasource.url=${PG_CONNECTOR}//lavagna_db_pg:${PG_PORT}/${DB_NAME}
+        -Ddatasource.username=${DB_LOGIN} 
+        -Ddatasource.password=${DB_PASS}
+        -Dspring.profiles.active=${APP_MODE}
+
     depends_on:
       - service_lavagna_db
 

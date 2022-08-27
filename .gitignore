@@ -1,1 +1,8 @@
+# can be sensetive
 **/.env
+# are definitely sensetive
+**/.creds
+# are too heavy and unnecessary
+**/*.war
+# are preliminary notices for runbook file
+**/draft.*
