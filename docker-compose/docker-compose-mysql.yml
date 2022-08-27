@@ -32,7 +32,7 @@ services:
     command: ['mysqld', '--character-set-server=utf8mb4', '--collation-server=utf8mb4_unicode_ci', '--log-bin-trust-function-creators=1']
  
     healthcheck:
-      test: ["CMD", 'mysqladmin', 'ping', '-h', 'localhost', '-u', 'root', '-p$MY_ROOT_PASS']
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MY_ROOT_PASS}"]
       start_period: 5s
       interval: 5s
       retries: 10
