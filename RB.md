@@ -545,7 +545,15 @@ Official page of Dockerized MySQL describe smart way to change some attributes/v
 
 ## Docker Compose + Lavagna + PostgreSQL/MySQL (transit variables)
 
-In this case the dockerized Lavagna will receive variables (for connection to DB and app mode) from Docker Compose file by "transit". This vars will be parsed by Compose from *.env* file and send to build stage.  
+> ***WARNING***
+>
+> Docker has own "philosophy" and one of the statements: **build once deploy anywhere** (actually this concept is common for many technologies).
+>
+> This case provides embedding of vars (for connection to DB and app mode) in Docker image of the Lavagna app.
+>
+> Obviously ***this is not recommended way*** to manipulate behaviour of the application. More dynamic and multipurpose way is passing arguments in **docker run ...**, **docker create ...** stages or in Docker Compose file. For this case combination of "smart" *ENTRYPOINT* and *CMD* instructions are used, like in previous chapter.
+
+In this case the dockerized Lavagna will receive variables from Docker Compose file by "transit". This vars will be parsed by Compose from *.env* file and send to build stage.  
 
 *ENV* cannot be freely passed to build, so this vars must be declared in *build* stage of Compose file, in *args* block
 
@@ -567,7 +575,9 @@ ARG name1_for_Dockerfile
 ARG name2_for_Dockerfile
 ```
 
-**Only now** this vars can be used both in *build* and *run* stage (when container will be runned/created from image).
+**Only now** this vars can be used both in *build* and *run* stage (when container will be runned/created from image). This "long way" of passing variables caused by crossing *ENV* and *ARG* only on *build* stage.
+
+![image](img/15.png?raw=true "vars availability in different stages")
 
 Also, the vars can be used:
 - directly in **CMD** string (*"JAVA_OPTIONS = -Darg1=..."*)  
@@ -586,7 +596,7 @@ If Docker Compose was previously runned with old variant of Dockerfile (without 
 ~ docker images | grep docker-compose
 ```
 
-![image](img/14.png?raw=true "Lavagna + PSQL after re-up by Dockre Compose")
+![image](img/14.png?raw=true "old Compose images")
 
 **Compose does not rebuild images by its own even there is obviously changes in Dockerfile !**
 
