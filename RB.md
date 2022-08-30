@@ -543,7 +543,7 @@ Official page of Dockerized MySQL describe smart way to change some attributes/v
 
     ![image](img/13.png?raw=true "Persistent volume is worked")
 
-## Lavagna as *.war* + Beanstalk
+## Lavagna as *.war* + S3 + Beanstalk
 
 To deploy Lavagna in this time there must be AWS account.
 
