@@ -1,0 +1,15 @@
+{
+    "AWSEBDockerrunVersion": 2,
+    "containerDefinitions": [
+        {
+            "name": "lavagna_single",
+            "image": "679954501512.dkr.ecr.us-east-1.amazonaws.com/lavagna:latest",
+            "essential": true,
+			"memory": 500,            
+            "portMappings": [{
+                "hostPort": 80,
+                "containerPort": 8080
+            }]
+        }
+    ]
+}

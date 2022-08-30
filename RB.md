@@ -562,3 +562,46 @@ To deploy Lavagna in this time there must be AWS account.
 - check link to service
 
     ![image](img/14.png?raw=true "Lavagna app on the AWS Beanstalk")
+
+## Dockerized Lavagna + ECR + Beanstalk
+
+- create **ECR** repository "lavagna"
+
+- perform recommend commands from "View push commands" in repository page for:
+    - retrieving auth token
+    
+    ```sh
+    ~ aws ecr get-login-password --profile milestep | docker login --username AWS --password-stdin 1234567890.dkr.ecr.region-1.amazonaws.com
+    ```
+    
+    - buildng
+    
+    ```sh
+    ~ docker build -t lavagna -f Dockerfile_lavagna .
+    ```
+
+    - tagging
+
+    ```sh
+    ~ docker tag lavagna:latest 1234567890.dkr.ecr.region-1.amazonaws.com/lavagna:latest
+    ```
+
+    - pushing
+
+    ```sh
+    ~ docker push 1234567890.dkr.ecr.region-1.amazonaws.com/lavagna:latest
+    ```
+
+- create deploy file -> [Dockerrun.aws.json](./aws/Dockerrun.aws.json)
+
+- upload *Dockerrun.aws.json* to available **S3** bucket
+
+- create new **Beanstalk** application
+
+    - based on **"ECS running on 64bit Amazon Linux 2"** platforn branch
+
+    - upload source origin code from **S3**
+
+- check the app
+
+    ![image](img/15.png?raw=true "dockerized Lavagna app on the AWS Beanstalk")
