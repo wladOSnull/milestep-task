@@ -542,3 +542,23 @@ Official page of Dockerized MySQL describe smart way to change some attributes/v
 - simple proof that containers were recreated and data was not lost
 
     ![image](img/13.png?raw=true "Persistent volume is worked")
+
+## Lavagna as *.war* + Beanstalk
+
+To deploy Lavagna in this time there must be AWS account.
+
+- create AWS account or get access to available)
+
+- create new **S3** bucket (default options + versioning)
+
+- upload *.war* artefact
+
+- create new **Beanstalk** service with Tomcat platform
+
+    - upload "source code" from **S3** bucket, use "Copy URL" button for artefact in bucket
+
+- wait couple of minute to deploying the Lavagna app
+
+- check link to service
+
+    ![image](img/14.png?raw=true "Lavagna app on the AWS Beanstalk")
