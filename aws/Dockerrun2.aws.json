@@ -1,0 +1,61 @@
+{
+    "AWSEBDockerrunVersion": 2,
+    
+    "containerDefinitions": [
+        {
+            "name": "lavagna_jetty",
+            "image": "679954501512.dkr.ecr.us-east-1.amazonaws.com/lavagna:latest",
+            "essential": true,
+			"memory": 500,            
+            "portMappings": [
+                {
+                    "hostPort": 80,
+                    "containerPort": 8080
+                }
+            ],
+            "environment": [
+                {
+                    "name": "JAVA_OPTIONS",
+                    "value": "-Ddatasource.dialect=PGSQL -Ddatasource.url=jdbc:postgresql://psql:5432/lavagna -Ddatasource.username=lavagner -Ddatasource.password=lava -Dspring.profiles.active=prod"
+                }
+            ],
+            "links": ["lavagna_psql"]
+        },
+        {
+            "name": "lavagna_psql",
+            "hostname": "psql",
+            "image": "679954501512.dkr.ecr.us-east-1.amazonaws.com/psql:latest",
+            "essential": true,
+			"memory": 200,
+            "mountPoints": [
+                {
+                    "containerPath": "/var/lib/postgresql/data/",
+                    "sourceVolume": "lavagna_vol_pg"
+                }
+            ],
+            "environment": [
+                {
+                    "name": "POSTGRES_DB",
+                    "value": "lavagna"
+                },
+                {
+                    "name": "POSTGRES_USER",
+                    "value": "lavagner"
+                },
+                {
+                    "name": "POSTGRES_PASSWORD",
+                    "value": "lava"
+                }
+            ]
+        }
+    ],
+
+	"volumes": [
+        {
+            "name": "lavagna_vol_pg",
+            "host": {
+                "sourcePath": "postgres_data"
+            }
+        }
+    ]
+}

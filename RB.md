@@ -605,3 +605,35 @@ To deploy Lavagna in this time there must be AWS account.
 - check the app
 
     ![image](img/15.png?raw=true "dockerized Lavagna app on the AWS Beanstalk")
+
+## Dockerized Lavagna + custom PostgreSQL + ECR + Beanstalk
+
+- create **ECR** repository "psql"
+
+- build new Docker image for PostgreSQL (use available Dokcerfile)
+
+    ```sh
+    ~ docker build -t psql -f Dockerfile_postgres .
+    ```
+
+- tag the image for **ECR** repo
+
+    ```sh
+    ~ docker tag psql:latest  1234567890.dkr.ecr.region-1.amazonaws.com/psql:latest
+    ```
+
+- push the image to **ECR**
+
+    ```sh
+    ~ docker push 1234567890.dkr.ecr.region-1.amazonaws.com/psql:latest
+    ```
+
+- create deploy file -> [Dockerrun2.aws.json](./aws/Dockerrun2.aws.json)
+
+- check the app
+
+    ![image](img/16.png?raw=true "dockerized Lavagna app with PostgreSQL on the AWS Beanstalk")
+
+- "health" of the environment
+
+    ![image](img/17.png?raw=true "working environment of the Lavagna and PostgreSQL")
