@@ -658,3 +658,19 @@ Small guide to separate some variables from *Dockerrun.aws.json* file -> [cyplo]
 - check the app
 
     ![image](img/18.png?raw=true "dockerized Lavagna app with PostgreSQL on the AWS Beanstalk (separated env vars)")
+
+## Dockerized Lavagna + custom PostgreSQL + ECR + Beanstalk
+
+For this case were used available Docker Compose file and it's .env file. Compose file needs small changes due to hosted Docker images on **ECR**.
+
+There is official guide for deploying Compose files to **Beanstalk** -> [aws](https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/docker.html)
+
+- edit Compose file -> [docker-cmpose.yml](/aws/ev-docker/docker-compose.yml)
+
+- "zip" the files (without root folder)
+
+- deploy to **Beanstalk Docker platform**
+
+- check the app
+
+    ![image](img/19.png?raw=true "Lavagna app with PostgreSQL on the AWS Beanstalk Docker platform")
