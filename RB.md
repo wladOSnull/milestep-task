@@ -609,7 +609,7 @@ https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/create_deploy_docker_v2co
 
     ![image](img/15.png?raw=true "dockerized Lavagna app on the AWS Beanstalk")
 
-## Dockerized Lavagna + custom PostgreSQL + ECR + Beanstalk
+## Dockerized Lavagna + custom PostgreSQL + ECR + Beanstalk ECS
 
 - create **ECR** repository "psql"
 
@@ -641,7 +641,7 @@ https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/create_deploy_docker_v2co
 
     ![image](img/17.png?raw=true "working environment of the Lavagna and PostgreSQL")
 
-## Dockerized Lavagna + custom PostgreSQL + ECR + Beanstalk v2
+## Dockerized Lavagna + custom PostgreSQL + ECR + Beanstalk ECS v2
 
 Small guide to separate some variables from *Dockerrun.aws.json* file -> [cyplo](https://blog.cyplo.dev/posts/2018/04/beanstalk-docker-environment-variables/)
 
@@ -659,7 +659,7 @@ Small guide to separate some variables from *Dockerrun.aws.json* file -> [cyplo]
 
     ![image](img/18.png?raw=true "dockerized Lavagna app with PostgreSQL on the AWS Beanstalk (separated env vars)")
 
-## Dockerized Lavagna + custom PostgreSQL + ECR + Beanstalk
+## Dockerized Lavagna + custom PostgreSQL + ECR + Beanstalk Docker
 
 For this case were used available Docker Compose file and it's .env file. Compose file needs small changes due to hosted Docker images on **ECR**.
 
