@@ -4,5 +4,6 @@
 **/.creds
 # are too heavy and unnecessary
 **/*.war
+**/*.zip
 # are preliminary notices for runbook file
 **/draft.*

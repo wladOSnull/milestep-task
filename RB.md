@@ -565,6 +565,9 @@ To deploy Lavagna in this time there must be AWS account.
 
 ## Dockerized Lavagna + ECR + Beanstalk
 
+Info about *Dockerrun.was.json* file -> [aws](
+https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/create_deploy_docker_v2config.html)
+
 - create **ECR** repository "lavagna"
 
 - perform recommend commands from "View push commands" in repository page for:
@@ -637,3 +640,21 @@ To deploy Lavagna in this time there must be AWS account.
 - "health" of the environment
 
     ![image](img/17.png?raw=true "working environment of the Lavagna and PostgreSQL")
+
+## Dockerized Lavagna + custom PostgreSQL + ECR + Beanstalk v2
+
+Small guide to separate some variables from *Dockerrun.aws.json* file -> [cyplo](https://blog.cyplo.dev/posts/2018/04/beanstalk-docker-environment-variables/)
+
+- create new version of deploying file -> [Dockerrun.aws.json](./aws/eb/Dockerrun.aws.json)
+
+    - the name **MUST BE** *Dockerrun.aws.json* necessarily, otherwise **Beanstalk** colud not parse this file to deploy containers and create for them task definition file in **ECS**
+
+- create folder *.ebextensions* -> [.ebetensions](./aws/eb/.ebextensions)
+
+- create file with variables in the folder -> [variables.conf](./aws/eb/.ebextensions/variables.config)
+
+- "zip" this files (without root folder) and deploy to **Beanstalk ECS platform**
+
+- check the app
+
+    ![image](img/18.png?raw=true "dockerized Lavagna app with PostgreSQL on the AWS Beanstalk (separated env vars)")
